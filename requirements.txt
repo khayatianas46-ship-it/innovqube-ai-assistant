@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+ollama
+sentence-transformers
+faiss-cpu
+numpy
+python-dotenv
+pytest
+httpx
+requests
