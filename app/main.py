@@ -31,54 +31,81 @@ def detect_intent(question: str) -> str:
     if any(word in q for word in ["wifi", "wi-fi", "mot de passe"]):
         return "wifi"
 
-    if any(word in q for word in ["check-in", "checkin", "arrivée", "arriver"]):
+    if any(
+        word in q
+        for word in ["check-in", "checkin", "arrivée", "arriver"]
+    ):
         return "checkin"
 
-    if any(word in q for word in ["check-out", "checkout", "départ", "quitter"]):
+    if any(
+        word in q
+        for word in ["check-out", "checkout", "départ", "quitter"]
+    ):
         return "checkout"
 
-    if any(word in q for word in ["petit-déjeuner", "petit déjeuner", "breakfast"]):
+    if any(
+        word in q
+        for word in ["petit-déjeuner", "petit déjeuner", "breakfast"]
+    ):
         return "breakfast"
 
-    if any(word in q for word in ["réception", "reception", "nuit"]):
+    if any(
+        word in q
+        for word in ["réception", "reception", "nuit"]
+    ):
         return "reception"
 
-    if any(word in q for word in ["équipement", "équipements", "amenities"]):
+    if any(
+        word in q
+        for word in ["équipement", "équipements", "amenities"]
+    ):
         return "amenities"
 
-    if any(word in q for word in [
-        "fête",
-        "animaux",
-        "fumer",
-        "règlement",
-        "règles",
-    ]):
+    if any(
+        word in q
+        for word in [
+            "fête",
+            "animaux",
+            "fumer",
+            "règlement",
+            "règles",
+        ]
+    ):
         return "rules"
 
-    if any(word in q for word in [
-        "service",
-        "services",
-        "parking",
-        "navette",
-        "room service",
-    ]):
+    if any(
+        word in q
+        for word in [
+            "service",
+            "services",
+            "parking",
+            "navette",
+            "room service",
+        ]
+    ):
         return "services"
 
-    if any(word in q for word in [
-        "restaurant",
-        "pharmacie",
-        "à proximité",
-        "proche",
-    ]):
+    if any(
+        word in q
+        for word in [
+            "restaurant",
+            "pharmacie",
+            "à proximité",
+            "proche",
+        ]
+    ):
         return "local_recommendation"
 
-    if any(word in q for word in [
-        "accès",
-        "acces",
-        "code",
-        "clé",
-        "boîte à clés",
-    ]):
+    if any(
+        word in q
+        for word in [
+            "accès",
+            "acces",
+            "code",
+            "clé",
+            "boîte à clés",
+        ]
+    ):
         return "access"
 
     return "unknown"
@@ -106,6 +133,7 @@ def ask(request: AskRequest):
     if property_data is None:
         return {
             "property_id": request.propriete_id,
+            "question": request.question,
             "intent": detect_intent(request.question),
             "grounded": False,
             "answer": "Je n’ai pas trouvé cette propriété dans le corpus.",
@@ -141,6 +169,13 @@ def ask(request: AskRequest):
         context=context,
     )
 
+    abstention = (
+        "je n’ai pas cette information" in answer.lower()
+        or "je n'ai pas cette information" in answer.lower()
+    )
+
+    grounded = not abstention
+
     passages = [
         {
             "field": result["field"],
@@ -155,7 +190,7 @@ def ask(request: AskRequest):
         "property_name": property_data["nom"],
         "question": request.question,
         "intent": intent,
-        "grounded": True,
+        "grounded": grounded,
         "answer": answer,
         "retrieved_passages": passages,
     }
